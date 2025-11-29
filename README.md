@@ -4,7 +4,7 @@ Este é um projeto simples de jogo de caça-níquel feito com Node.js e JavaScri
 O jogo roda no terminal e mostra três símbolos aleatórios.
 Se todos os três forem iguais, o jogador ganha. Caso contrário, perde.
 
-🔧 Como funciona
+ Como funciona
 
 O jogador digita um comando para rodar a máquina.
 
