@@ -1,66 +1,142 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Caça-Níquel</title>
-    <style>
-        body {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            background: #222;
-            color: white;
-            font-family: Arial, sans-serif;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Caça-Níquel Deluxe</title>
 
-        h1 {
-            margin-bottom: 20px;
-        }
+<style>
+    body {
+        background: linear-gradient(135deg, #1a1a1a, #000);
+        font-family: Arial, sans-serif;
+        color: #fff;
+        text-align: center;
+        padding: 30px;
+    }
 
-        .slot {
-            display: flex;
-            gap: 20px;
-            font-size: 5rem;
-            margin: 20px 0;
-        }
+    h1 {
+        font-size: 3rem;
+        color: #ffdd00;
+        text-shadow: 0 0 15px #ffdd00;
+        margin-bottom: 20px;
+    }
 
-        button {
-            padding: 10px 20px;
-            font-size: 1.2rem;
-            cursor: pointer;
-        }
+    .machine {
+        display: flex;
+        justify-content: center;
+        gap: 25px;
+        margin: 30px 0;
+    }
 
-        #result {
-            margin-top: 15px;
-            font-size: 1.5rem;
-        }
-    </style>
+    .slot {
+        width: 120px;
+        height: 120px;
+        border: 4px solid #ffdd00;
+        border-radius: 15px;
+        background: #111;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 5rem;
+        color: #ffdd00;
+        box-shadow: 0 0 20px #ffdd00;
+        transition: transform 0.3s ease;
+    }
+
+    button {
+        background: #ffdd00;
+        color: black;
+        border: none;
+        padding: 12px 25px;
+        font-size: 1.3rem;
+        border-radius: 10px;
+        cursor: pointer;
+        margin-top: 10px;
+        font-weight: bold;
+        transition: 0.3s;
+    }
+
+    button:hover {
+        background: #ffe94d;
+        transform: scale(1.05);
+    }
+
+    #result {
+        margin-top: 20px;
+        font-size: 1.8rem;
+        height: 40px;
+        text-shadow: 0 0 10px #fff;
+    }
+
+    .info {
+        margin-top: 20px;
+        font-size: 1.3rem;
+    }
+
+    .danger {
+        color: red;
+        text-shadow: 0 0 10px red;
+    }
+
+    @keyframes spin {
+        0% { transform: rotateX(0deg); }
+        100% { transform: rotateX(720deg); }
+    }
+</style>
 </head>
 <body>
 
-    <h1> Jogo de Caça-Níquel</h1>
+<h1>Caça-Níquel Deluxe</h1>
 
-    <div class="slot">
-        <div id="s1">?</div>
-        <div id="s2">?</div>
-        <div id="s3">?</div>
-    </div>
+<div class="info">
+    Créditos: <span id="credits">100</span>  
+    | Aposta: <span id="bet">10</span>
+</div>
 
-    <button onclick="play()">Girar</button>
+<div class="machine">
+    <div class="slot" id="s1">?</div>
+    <div class="slot" id="s2">?</div>
+    <div class="slot" id="s3">?</div>
+</div>
 
-    <div id="result"></div>
+<button onclick="play()">Girar</button>
 
-    <script>
-        const symbols = ["1", "2", "3", "4", "5"];
+<div id="result"></div>
 
-        function randomSymbol() {
-            return symbols[Math.floor(Math.random() * symbols.length)];
+<script>
+    // Símbolos simples sem emojis
+    const symbols = ["A", "B", "C", "D", "E", "F"];
+
+    let credits = 100;
+    let bet = 10;
+
+    function randomSymbol() {
+        return symbols[Math.floor(Math.random() * symbols.length)];
+    }
+
+    function animateSlots() {
+        const slots = document.querySelectorAll(".slot");
+        slots.forEach(slot => {
+            slot.style.animation = "spin 0.5s ease";
+            setTimeout(() => slot.style.animation = "", 500);
+        });
+    }
+
+    function play() {
+
+        // RUÍNA DO JOGADOR
+        if (credits <= 0) {
+            document.getElementById("result").innerHTML =
+                "<span class='danger'>Você ficou sem créditos. Ruína do jogador atingida.</span>";
+            return;
         }
 
-        function play() {
+        credits -= bet;
+        document.getElementById("credits").textContent = credits;
+
+        animateSlots();
+
+        setTimeout(() => {
             const s1 = randomSymbol();
             const s2 = randomSymbol();
             const s3 = randomSymbol();
@@ -69,13 +145,32 @@
             document.getElementById("s2").textContent = s2;
             document.getElementById("s3").textContent = s3;
 
+            let message = "";
+
             if (s1 === s2 && s2 === s3) {
-                document.getElementById("result").textContent = "Você ganhou!";
+                const prize = bet * 10;
+                credits += prize;
+                message = `JACKPOT! Você ganhou ${prize} créditos.`;
+            } else if (s1 === s2 || s2 === s3 || s1 === s3) {
+                const prize = bet * 2;
+                credits += prize;
+                message = `Você conseguiu uma dupla! Ganhou ${prize} créditos.`;
             } else {
-                document.getElementById("result").textContent = " Tente novamente!";
+                message = "Nenhuma combinação. Tente novamente.";
             }
-        }
-    </script>
+
+            document.getElementById("credits").textContent = credits;
+            document.getElementById("result").textContent = message;
+
+            // Ruína do jogador após rodada
+            if (credits <= 0) {
+                document.getElementById("result").innerHTML =
+                    "<span class='danger'>Você perdeu tudo. Ruína do jogador atingida.</span>";
+            }
+
+        }, 500);
+    }
+</script>
 
 </body>
 </html>
